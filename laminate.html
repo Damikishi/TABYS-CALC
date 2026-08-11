@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор ламината — TABYS STROY</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner container">
+      <a href="index.html" class="logo-link" aria-label="TABYS STROY">
+        <div class="logo-brand">
+          <svg viewBox="0 0 120 80" class="logo-icon" aria-hidden="true">
+            <path d="M10 50 L50 10 L90 50" fill="none" stroke="#E21B12" stroke-width="14" stroke-linecap="round" />
+            <path d="M32 50 L32 70 L88 70" fill="none" stroke="#111" stroke-width="14" stroke-linecap="round" />
+          </svg>
+          <div>
+            <span class="logo-title">TABYS STROY</span>
+            <span class="logo-subtitle">Калькулятор строительных материалов</span>
+          </div>
+        </div>
+      </a>
+      <nav class="site-nav" aria-label="Навигация">
+        <a href="tile.html">Кафель</a>
+        <a href="linoleum.html">Линолеум</a>
+        <a href="laminate.html">Ламинат</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="calculator-section">
+      <div class="section-header">
+        <span class="section-tag">Калькулятор ламината</span>
+        <h2>Расчет количества пачек</h2>
+        <p>Введите размеры доски и комнаты, чтобы получить нужное количество и стоимость.</p>
+      </div>
+      <div class="calculator-grid">
+        <div class="calculator-card">
+          <div class="option-group">
+            <label class="option-title">Размер одной доски</label>
+            <div class="field-row board-size-row">
+              <input id="laminateBoardLength" type="number" min="0" step="1" value="1285" />
+              <span>×</span>
+              <input id="laminateBoardWidth" type="number" min="0" step="1" value="192" />
+              <span>мм</span>
+            </div>
+            <div class="tile-info">Площадь одной доски: <span id="laminateBoardArea">0.25</span> м²</div>
+          </div>
+          <form id="laminateForm" class="calculator-form" novalidate>
+            <div class="field-row">
+              <label>Длина помещения, м</label>
+              <input id="laminateLength" type="number" min="0" step="0.01" placeholder="Например 5" />
+            </div>
+            <div class="field-row">
+              <label>Ширина помещения, м</label>
+              <input id="laminateWidth" type="number" min="0" step="0.01" placeholder="Например 4" />
+            </div>
+            <div class="field-row">
+              <label>Цена за 1 м², ₸</label>
+              <input id="laminatePrice" type="number" min="0" step="1" placeholder="Например 4200" />
+            </div>
+            <div class="field-row buffer-row">
+              <label>Запас, %</label>
+              <div class="buffer-controls">
+                <div class="switch-field">
+                  <input id="laminateBufferToggle" type="checkbox" checked />
+                  <label for="laminateBufferToggle">Добавить запас 10%</label>
+                </div>
+                <input id="laminateBuffer" type="number" min="0" max="50" step="1" value="10" />
+              </div>
+            </div>
+            <p class="error-message" id="laminateError"></p>
+            <div class="button-row">
+              <button id="laminateCalculate" type="button" class="button button-primary">РАССЧИТАТЬ</button>
+              <button id="laminateClear" type="button" class="button button-secondary">ОЧИСТИТЬ</button>
+            </div>
+          </form>
+        </div>
+        <div class="result-card" id="laminateResultCard">
+          <div class="result-header">
+            <h3>Ваш расчёт для ламината</h3>
+            <button class="button button-copy" id="laminateCopy">СКОПИРОВАТЬ РАСЧЕТ</button>
+          </div>
+          <div class="result-content" id="laminateResultContent">
+            <div class="result-row"><span>В пачке:</span><strong>8 шт.</strong></div>
+            <div class="result-row"><span>Площадь одной пачки:</span><strong id="laminateResultPackArea">0 м²</strong></div>
+            <div class="result-row"><span>Общая площадь:</span><strong id="laminateResultArea">0 м²</strong></div>
+            <div class="result-row"><span>Необходимо:</span><strong id="laminateResultPacks">0 пачек</strong></div>
+            <div class="result-row"><span>Итого:</span><strong class="price-value" id="laminateResultTotal">0 ₸</strong></div>
+          </div>
+          <p class="copy-feedback" id="laminateCopyFeedback">Скопировано в буфер обмена</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>TABYS STROY</strong>
+        <p>Калькулятор строительных материалов</p>
+      </div>
+      <div>© 2026 TABYS STROY</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
