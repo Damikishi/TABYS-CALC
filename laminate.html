@@ -39,14 +39,11 @@
       <div class="calculator-grid">
         <div class="calculator-card">
           <div class="option-group">
-            <label class="option-title">Размер одной доски</label>
-            <div class="field-row board-size-row">
-              <input id="laminateBoardLength" type="number" min="0" step="1" value="1285" />
-              <span>×</span>
-              <input id="laminateBoardWidth" type="number" min="0" step="1" value="192" />
-              <span>мм</span>
+            <label class="option-title">Площадь одной пачки</label>
+            <div class="field-row">
+              <input id="laminatePackArea" type="number" min="0" step="0.01" placeholder="Например 2.2" />
             </div>
-            <div class="tile-info">Площадь одной доски: <span id="laminateBoardArea">0.25</span> м²</div>
+            <div class="tile-info">Введите площадь одной пачки в м²</div>
           </div>
           <form id="laminateForm" class="calculator-form" novalidate>
             <div class="field-row">
@@ -60,16 +57,6 @@
             <div class="field-row">
               <label>Цена за 1 м², ₸</label>
               <input id="laminatePrice" type="number" min="0" step="1" placeholder="Например 4200" />
-            </div>
-            <div class="field-row buffer-row">
-              <label>Запас, %</label>
-              <div class="buffer-controls">
-                <div class="switch-field">
-                  <input id="laminateBufferToggle" type="checkbox" checked />
-                  <label for="laminateBufferToggle">Добавить запас 10%</label>
-                </div>
-                <input id="laminateBuffer" type="number" min="0" max="50" step="1" value="10" />
-              </div>
             </div>
             <p class="error-message" id="laminateError"></p>
             <div class="button-row">

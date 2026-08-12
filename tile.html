@@ -88,16 +88,6 @@
                 <input id="tilePriceWalls" type="number" min="0" step="1" placeholder="Например 5500" />
               </div>
             </div>
-            <div class="field-row buffer-row">
-              <label>Запас, %</label>
-              <div class="buffer-controls">
-                <div class="switch-field">
-                  <input id="tileBufferToggle" type="checkbox" checked />
-                  <label for="tileBufferToggle">Добавить запас 10%</label>
-                </div>
-                <input id="tileBuffer" type="number" min="0" max="50" step="1" value="10" />
-              </div>
-            </div>
             <p class="error-message" id="tileError"></p>
             <div class="button-row">
               <button id="tileCalculate" type="button" class="button button-primary">РАССЧИТАТЬ</button>
@@ -114,7 +104,6 @@
             <div class="result-row"><span>Тип расчета:</span><strong id="tileResultMode">Пол</strong></div>
             <div class="result-row"><span>Размер плитки:</span><strong id="tileResultSize">120×60 см</strong></div>
             <div class="result-row"><span>Площадь помещения:</span><strong id="tileResultArea">0 м²</strong></div>
-            <div class="result-row"><span>Площадь с запасом:</span><strong id="tileResultAreaBuffer">0 м²</strong></div>
             <div class="result-row"><span>Необходимо плитки:</span><strong id="tileResultCount">0 шт.</strong></div>
             <div class="result-row"><span>Итого:</span><strong class="price-value" id="tileResultTotal">0 ₸</strong></div>
           </div>
