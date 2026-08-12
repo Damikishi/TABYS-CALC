@@ -72,6 +72,31 @@ let selectedTile = tileOptions[0];
 let selectedTileMode = 'floor';
 let selectedLinoleumWidth = 2.5;
 
+function applyTheme(theme) {
+  const selectedTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', selectedTheme);
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) {
+    toggle.textContent = selectedTheme === 'dark' ? '☀️ Светлая' : '🌙 Темная';
+    toggle.setAttribute('aria-label', selectedTheme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на темную тему');
+  }
+  localStorage.setItem('tabys-theme', selectedTheme);
+}
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('tabys-theme');
+  const initialTheme = savedTheme || 'dark';
+  applyTheme(initialTheme);
+
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    });
+  }
+}
+
 function formatNumber(value, decimals = 2) {
   return new Intl.NumberFormat('ru-RU', {
     minimumFractionDigits: 0,
@@ -302,6 +327,7 @@ function initializeLaminate() {
   });
 }
 
+initializeTheme();
 initializeTile();
 initializeLinoleum();
 initializeLaminate();
