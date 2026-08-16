@@ -122,18 +122,29 @@ function initializeMenu() {
   const siteNav = document.getElementById('siteNav');
   if (!menuToggle || !siteNav) return;
 
-  menuToggle.addEventListener('click', () => {
-    const isOpen = siteNav.classList.toggle('is-open');
+  const closeMenu = () => {
+    siteNav.classList.remove('is-open');
+    menuToggle.classList.remove('is-open');
+    menuToggle.setAttribute('aria-expanded', 'false');
+  };
+
+  menuToggle.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    const isOpen = !siteNav.classList.contains('is-open');
+    siteNav.classList.toggle('is-open', isOpen);
     menuToggle.classList.toggle('is-open', isOpen);
     menuToggle.setAttribute('aria-expanded', String(isOpen));
   });
 
-  siteNav.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      siteNav.classList.remove('is-open');
-      menuToggle.classList.remove('is-open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-    });
+  siteNav.querySelectorAll('a, .theme-toggle').forEach((item) => {
+    item.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.menu-toggle') && !event.target.closest('.site-nav')) {
+      closeMenu();
+    }
   });
 }
 
