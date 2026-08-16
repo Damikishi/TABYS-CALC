@@ -66,6 +66,26 @@ const elements = {
     copyFeedback: document.getElementById('laminateCopyFeedback'),
     form: document.getElementById('laminateForm'),
   },
+  marble: {
+    wallLength: document.getElementById('marbleWallLength'),
+    wallWidth: document.getElementById('marbleWallWidth'),
+    wallHeight: document.getElementById('marbleWallHeight'),
+    sheetPrice: document.getElementById('marbleSheetPrice'),
+    gluePerSheet: document.getElementById('marbleGluePerSheet'),
+    calculate: document.getElementById('marbleCalculate'),
+    clear: document.getElementById('marbleClear'),
+    error: document.getElementById('marbleError'),
+    resultCard: document.getElementById('marbleResultCard'),
+    resultWallArea: document.getElementById('marbleResultWallArea'),
+    resultSheetSize: document.getElementById('marbleResultSheetSize'),
+    resultSheets: document.getElementById('marbleResultSheets'),
+    resultGlue: document.getElementById('marbleResultGlue'),
+    resultMaterialCost: document.getElementById('marbleResultMaterialCost'),
+    resultTotal: document.getElementById('marbleResultTotal'),
+    copy: document.getElementById('marbleCopy'),
+    copyFeedback: document.getElementById('marbleCopyFeedback'),
+    form: document.getElementById('marbleForm'),
+  },
 };
 
 let selectedTile = tileOptions[0];
@@ -95,6 +115,26 @@ function initializeTheme() {
       applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
   }
+}
+
+function initializeMenu() {
+  const menuToggle = document.querySelector('.menu-toggle');
+  const siteNav = document.getElementById('siteNav');
+  if (!menuToggle || !siteNav) return;
+
+  menuToggle.addEventListener('click', () => {
+    const isOpen = siteNav.classList.toggle('is-open');
+    menuToggle.classList.toggle('is-open', isOpen);
+    menuToggle.setAttribute('aria-expanded', String(isOpen));
+  });
+
+  siteNav.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      siteNav.classList.remove('is-open');
+      menuToggle.classList.remove('is-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
 }
 
 function formatNumber(value, decimals = 2) {
@@ -329,7 +369,65 @@ function initializeLaminate() {
   });
 }
 
+function initializeMarble() {
+  if (!elements.marble.form) return;
+
+  const sheetArea = 1.2 * 2.8;
+  const sheetSizeLabel = '1.2 × 2.8 м';
+  const sheetAreaEl = document.getElementById('marbleSheetArea');
+  if (sheetAreaEl) sheetAreaEl.textContent = `${formatNumber(sheetArea, 2)} м²`;
+
+  elements.marble.calculate.addEventListener('click', () => {
+    clearError(elements.marble.error);
+
+    const wallLength = getPositiveValue(elements.marble.wallLength, 'длину стены');
+    if (typeof wallLength === 'string') return showError(elements.marble.error, wallLength);
+    const wallWidth = getPositiveValue(elements.marble.wallWidth, 'ширину стены');
+    if (typeof wallWidth === 'string') return showError(elements.marble.error, wallWidth);
+    const wallHeight = getPositiveValue(elements.marble.wallHeight, 'высоту стены');
+    if (typeof wallHeight === 'string') return showError(elements.marble.error, wallHeight);
+    const sheetPrice = getPositiveValue(elements.marble.sheetPrice, 'цену за 1 лист');
+    if (typeof sheetPrice === 'string') return showError(elements.marble.error, sheetPrice);
+    const gluePerSheet = getPositiveValue(elements.marble.gluePerSheet, 'клей на 1 лист');
+    if (typeof gluePerSheet === 'string') return showError(elements.marble.error, gluePerSheet);
+
+    const wallArea = (wallLength + wallWidth) * 2 * wallHeight;
+    const sheetCount = Math.ceil(wallArea / sheetArea);
+    const glueTubes = Math.ceil(sheetCount * gluePerSheet);
+    const materialCost = sheetCount * sheetPrice;
+    const totalCost = materialCost;
+
+    elements.marble.resultWallArea.textContent = `${formatNumber(wallArea, 2)} м²`;
+    elements.marble.resultSheetSize.textContent = sheetSizeLabel;
+    elements.marble.resultSheets.textContent = `${sheetCount} шт.`;
+    elements.marble.resultGlue.textContent = `${glueTubes} тюб.`;
+    elements.marble.resultMaterialCost.textContent = formatCurrency(materialCost);
+    elements.marble.resultTotal.textContent = formatCurrency(totalCost);
+    elements.marble.resultCard.classList.add('active');
+  });
+
+  elements.marble.clear.addEventListener('click', () => {
+    elements.marble.form.reset();
+    elements.marble.gluePerSheet.value = '1.5';
+    clearError(elements.marble.error);
+    elements.marble.resultCard.classList.remove('active');
+    elements.marble.resultWallArea.textContent = '0 м²';
+    elements.marble.resultSheetSize.textContent = sheetSizeLabel;
+    elements.marble.resultSheets.textContent = '0 шт.';
+    elements.marble.resultGlue.textContent = '0 тюб.';
+    elements.marble.resultMaterialCost.textContent = '0 ₸';
+    elements.marble.resultTotal.textContent = '0 ₸';
+  });
+
+  elements.marble.copy.addEventListener('click', () => {
+    const text = `TABYS STROY\n\nРасчет гибкого мрамора\nПлощадь стены: ${elements.marble.resultWallArea.textContent}\nРазмер листа: ${elements.marble.resultSheetSize.textContent}\nКоличество листов: ${elements.marble.resultSheets.textContent}\nКлей: ${elements.marble.resultGlue.textContent}\nСтоимость материала: ${elements.marble.resultMaterialCost.textContent}\nОбщая стоимость: ${elements.marble.resultTotal.textContent}`;
+    copyText(text, elements.marble.copyFeedback);
+  });
+}
+
 initializeTheme();
+initializeMenu();
 initializeTile();
 initializeLinoleum();
 initializeLaminate();
+initializeMarble();
