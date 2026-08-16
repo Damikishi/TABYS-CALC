@@ -204,12 +204,14 @@ function initializeTile() {
     }
 
     const tileCount = Math.ceil(areaRoom / selectedTile.area);
+    const coveredArea = tileCount * selectedTile.area;
     const totalCost = tileCount * selectedTile.area * price;
 
     elements.tile.resultMode.textContent = description;
-    elements.tile.resultArea.textContent = `${formatNumber(areaRoom, 2)} м²`;
-    elements.tile.resultCount.textContent = `${tileCount} шт.`;
-    elements.tile.resultTotal.textContent = formatCurrency(totalCost);
+    if (elements.tile.resultArea) elements.tile.resultArea.textContent = `${formatNumber(coveredArea, 2)} м²`;
+    if (elements.tile.resultAreaBuffer) elements.tile.resultAreaBuffer.textContent = `${formatNumber(areaRoom, 2)} м²`;
+    if (elements.tile.resultCount) elements.tile.resultCount.textContent = `${tileCount} шт.`;
+    if (elements.tile.resultTotal) elements.tile.resultTotal.textContent = formatCurrency(totalCost);
     elements.tile.resultCard.classList.add('active');
   });
 
