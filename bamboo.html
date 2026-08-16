@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Калькулятор гибкого мрамора — TABYS STROY</title>
+  <title>Калькулятор бамбук панелей — TABYS STROY</title>
   <link rel="icon" href="logo.png" type="image/png" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -40,58 +40,58 @@
   <main class="container">
     <section class="calculator-section">
       <div class="section-header">
-        <span class="section-tag">Калькулятор гибкого мрамора</span>
+        <span class="section-tag">Калькулятор бамбук панелей</span>
         <h2>Расчет листов и клея</h2>
-        <p>Укажите площадь стены, стоимость листа и расход клея — получите количество материала и итоговую сумму.</p>
+        <p>Укажите размеры стены, цену панели и расход клея — получите количество материала и итоговую сумму.</p>
       </div>
       <div class="calculator-grid">
         <div class="calculator-card">
-          <form id="marbleForm" class="calculator-form" novalidate>
+          <form id="bambooForm" class="calculator-form" novalidate>
             <div class="field-row">
               <label>Длина стены, м</label>
-              <input id="marbleWallLength" type="number" min="0" step="0.01" placeholder="Например 5" />
+              <input id="bambooWallLength" type="number" min="0" step="0.01" placeholder="Например 5" />
             </div>
             <div class="field-row">
               <label>Ширина стены, м</label>
-              <input id="marbleWallWidth" type="number" min="0" step="0.01" placeholder="Например 3" />
+              <input id="bambooWallWidth" type="number" min="0" step="0.01" placeholder="Например 3" />
             </div>
             <div class="field-row">
               <label>Высота стены, м</label>
-              <input id="marbleWallHeight" type="number" min="0" step="0.01" placeholder="Например 2.8" />
+              <input id="bambooWallHeight" type="number" min="0" step="0.01" placeholder="Например 2.8" />
             </div>
             <div class="field-row">
               <label>Цена за 1 лист, ₸</label>
-              <input id="marbleSheetPrice" type="number" min="0" step="1" placeholder="Например 12.000" />
+              <input id="bambooSheetPrice" type="number" min="0" step="1" placeholder="Например 12000" />
             </div>
             <div class="field-row">
               <label>Клей на 1 лист, тюб.</label>
-              <input id="marbleGluePerSheet" type="number" min="0" step="0.1" value="1.5" placeholder="Например 1.5" />
+              <input id="bambooGluePerSheet" type="number" min="0" step="0.1" value="1.5" placeholder="Например 1.5" />
             </div>
             <div class="option-group">
               <label class="option-title">Размер листа</label>
-              <div class="tile-info">Стандарт: <strong id="marbleSheetArea">3.36 м²</strong> (1.2 × 2.8 м)</div>
+              <div class="tile-info">Стандарт: <strong id="bambooSheetArea">3.335 м²</strong> (1.15 × 2.9 м)</div>
             </div>
-            <p class="error-message" id="marbleError"></p>
+            <p class="error-message" id="bambooError"></p>
             <div class="button-row">
-              <button id="marbleCalculate" type="button" class="button button-primary">РАССЧИТАТЬ</button>
-              <button id="marbleClear" type="button" class="button button-secondary">ОЧИСТИТЬ</button>
+              <button id="bambooCalculate" type="button" class="button button-primary">РАССЧИТАТЬ</button>
+              <button id="bambooClear" type="button" class="button button-secondary">ОЧИСТИТЬ</button>
             </div>
           </form>
         </div>
-        <div class="result-card" id="marbleResultCard">
+        <div class="result-card" id="bambooResultCard">
           <div class="result-header">
-            <h3>Ваш расчёт для гибкого мрамора</h3>
-            <button class="button button-copy" id="marbleCopy">СКОПИРОВАТЬ РАСЧЕТ</button>
+            <h3>Ваш расчёт для бамбук панелей</h3>
+            <button class="button button-copy" id="bambooCopy">СКОПИРОВАТЬ РАСЧЕТ</button>
           </div>
-          <div class="result-content" id="marbleResultContent">
-            <div class="result-row"><span>Площадь стены:</span><strong id="marbleResultWallArea">0 м²</strong></div>
-            <div class="result-row"><span>Размер листа:</span><strong id="marbleResultSheetSize">1.2 × 2.8 м</strong></div>
-            <div class="result-row"><span>Количество листов:</span><strong id="marbleResultSheets">0 шт.</strong></div>
-            <div class="result-row"><span>Клей:</span><strong id="marbleResultGlue">0 тюб.</strong></div>
-            <div class="result-row"><span>Стоимость материала:</span><strong id="marbleResultMaterialCost">0 ₸</strong></div>
-            <div class="result-row"><span>Общая стоимость:</span><strong class="price-value" id="marbleResultTotal">0 ₸</strong></div>
+          <div class="result-content" id="bambooResultContent">
+            <div class="result-row"><span>Площадь стены:</span><strong id="bambooResultWallArea">0 м²</strong></div>
+            <div class="result-row"><span>Размер листа:</span><strong id="bambooResultSheetSize">1.15 × 2.9 м</strong></div>
+            <div class="result-row"><span>Количество листов:</span><strong id="bambooResultSheets">0 шт.</strong></div>
+            <div class="result-row"><span>Клей:</span><strong id="bambooResultGlue">0 тюб.</strong></div>
+            <div class="result-row"><span>Стоимость материала:</span><strong id="bambooResultMaterialCost">0 ₸</strong></div>
+            <div class="result-row"><span>Общая стоимость:</span><strong class="price-value" id="bambooResultTotal">0 ₸</strong></div>
           </div>
-          <p class="copy-feedback" id="marbleCopyFeedback">Скопировано в буфер обмена</p>
+          <p class="copy-feedback" id="bambooCopyFeedback">Скопировано в буфер обмена</p>
         </div>
       </div>
     </section>

@@ -86,6 +86,26 @@ const elements = {
     copyFeedback: document.getElementById('marbleCopyFeedback'),
     form: document.getElementById('marbleForm'),
   },
+  bamboo: {
+    wallLength: document.getElementById('bambooWallLength'),
+    wallWidth: document.getElementById('bambooWallWidth'),
+    wallHeight: document.getElementById('bambooWallHeight'),
+    sheetPrice: document.getElementById('bambooSheetPrice'),
+    gluePerSheet: document.getElementById('bambooGluePerSheet'),
+    calculate: document.getElementById('bambooCalculate'),
+    clear: document.getElementById('bambooClear'),
+    error: document.getElementById('bambooError'),
+    resultCard: document.getElementById('bambooResultCard'),
+    resultWallArea: document.getElementById('bambooResultWallArea'),
+    resultSheetSize: document.getElementById('bambooResultSheetSize'),
+    resultSheets: document.getElementById('bambooResultSheets'),
+    resultGlue: document.getElementById('bambooResultGlue'),
+    resultMaterialCost: document.getElementById('bambooResultMaterialCost'),
+    resultTotal: document.getElementById('bambooResultTotal'),
+    copy: document.getElementById('bambooCopy'),
+    copyFeedback: document.getElementById('bambooCopyFeedback'),
+    form: document.getElementById('bambooForm'),
+  },
 };
 
 let selectedTile = tileOptions[0];
@@ -436,9 +456,66 @@ function initializeMarble() {
   });
 }
 
+function initializeBamboo() {
+  if (!elements.bamboo.form) return;
+
+  const sheetArea = 1.15 * 2.9;
+  const sheetSizeLabel = '1.15 × 2.9 м';
+  const sheetAreaEl = document.getElementById('bambooSheetArea');
+  if (sheetAreaEl) sheetAreaEl.textContent = `${formatNumber(sheetArea, 2)} м²`;
+
+  elements.bamboo.calculate.addEventListener('click', () => {
+    clearError(elements.bamboo.error);
+
+    const wallLength = getPositiveValue(elements.bamboo.wallLength, 'длину стены');
+    if (typeof wallLength === 'string') return showError(elements.bamboo.error, wallLength);
+    const wallWidth = getPositiveValue(elements.bamboo.wallWidth, 'ширину стены');
+    if (typeof wallWidth === 'string') return showError(elements.bamboo.error, wallWidth);
+    const wallHeight = getPositiveValue(elements.bamboo.wallHeight, 'высоту стены');
+    if (typeof wallHeight === 'string') return showError(elements.bamboo.error, wallHeight);
+    const sheetPrice = getPositiveValue(elements.bamboo.sheetPrice, 'цену за 1 лист');
+    if (typeof sheetPrice === 'string') return showError(elements.bamboo.error, sheetPrice);
+    const gluePerSheet = getPositiveValue(elements.bamboo.gluePerSheet, 'клей на 1 лист');
+    if (typeof gluePerSheet === 'string') return showError(elements.bamboo.error, gluePerSheet);
+
+    const wallArea = (wallLength + wallWidth) * 2 * wallHeight;
+    const sheetCount = Math.ceil(wallArea / sheetArea);
+    const glueTubes = Math.ceil(sheetCount * gluePerSheet);
+    const materialCost = sheetCount * sheetPrice;
+    const totalCost = materialCost;
+
+    elements.bamboo.resultWallArea.textContent = `${formatNumber(wallArea, 2)} м²`;
+    elements.bamboo.resultSheetSize.textContent = sheetSizeLabel;
+    elements.bamboo.resultSheets.textContent = `${sheetCount} шт.`;
+    elements.bamboo.resultGlue.textContent = `${glueTubes} тюб.`;
+    elements.bamboo.resultMaterialCost.textContent = formatCurrency(materialCost);
+    elements.bamboo.resultTotal.textContent = formatCurrency(totalCost);
+    elements.bamboo.resultCard.classList.add('active');
+  });
+
+  elements.bamboo.clear.addEventListener('click', () => {
+    elements.bamboo.form.reset();
+    elements.bamboo.gluePerSheet.value = '1.5';
+    clearError(elements.bamboo.error);
+    elements.bamboo.resultCard.classList.remove('active');
+    elements.bamboo.resultWallArea.textContent = '0 м²';
+    elements.bamboo.resultSheetSize.textContent = sheetSizeLabel;
+    elements.bamboo.resultSheets.textContent = '0 шт.';
+    elements.bamboo.resultGlue.textContent = '0 тюб.';
+    elements.bamboo.resultMaterialCost.textContent = '0 ₸';
+    elements.bamboo.resultTotal.textContent = '0 ₸';
+  });
+
+  elements.bamboo.copy.addEventListener('click', () => {
+    const text = `TABYS STROY\n\nРасчет бамбук панелей\nПлощадь стены: ${elements.bamboo.resultWallArea.textContent}\nРазмер листа: ${elements.bamboo.resultSheetSize.textContent}\nКоличество листов: ${elements.bamboo.resultSheets.textContent}\nКлей: ${elements.bamboo.resultGlue.textContent}\nСтоимость материала: ${elements.bamboo.resultMaterialCost.textContent}\nОбщая стоимость: ${elements.bamboo.resultTotal.textContent}`;
+    copyText(text, elements.bamboo.copyFeedback);
+  });
+}
+
 initializeTheme();
 initializeMenu();
 initializeTile();
 initializeLinoleum();
 initializeLaminate();
 initializeMarble();
+initializeBamboo();
