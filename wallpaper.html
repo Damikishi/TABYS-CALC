@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор обоев — TABYS STROY</title>
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner container">
+      <a href="index.html" class="logo-link" aria-label="TABYS STROY">
+        <div class="logo-brand">
+          <img src="logo.png" alt="TABYS STROY" class="logo-icon" />
+          <div>
+            <span class="logo-title">TABYS STROY</span>
+            <span class="logo-subtitle">Калькулятор строительных материалов</span>
+          </div>
+        </div>
+      </a>
+      <div class="header-actions">
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="siteNav" aria-label="Открыть меню">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <nav class="site-nav" id="siteNav" aria-label="Навигация">
+          <a href="tile.html">Кафель</a>
+          <a href="linoleum.html">Линолеум</a>
+          <a href="laminate.html">Ламинат</a>
+          <a href="marble.html">Гибкий мрамор</a>
+          <a href="bamboo.html">Бамбук панели</a>
+          <a href="wallpaper.html">Обои</a>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">🌙 Темная</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="calculator-section">
+      <div class="section-header">
+        <span class="section-tag">Калькулятор обоев</span>
+        <h2>Расчет рулонов и стоимости</h2>
+        <p>Укажите размеры комнаты, площадь окон и дверей, запас и цену рулона — система рассчитает количество обоев и итог.</p>
+      </div>
+      <div class="calculator-grid">
+        <div class="calculator-card">
+          <form id="wallpaperForm" class="calculator-form" novalidate>
+            <div class="field-row">
+              <label>Длина комнаты, м</label>
+              <input id="wallpaperLength" type="number" min="0" step="0.01" placeholder="Например 5" />
+            </div>
+            <div class="field-row">
+              <label>Ширина комнаты, м</label>
+              <input id="wallpaperWidth" type="number" min="0" step="0.01" placeholder="Например 4" />
+            </div>
+            <div class="field-row">
+              <label>Высота стен, м</label>
+              <input id="wallpaperHeight" type="number" min="0" step="0.01" placeholder="Например 2.7" />
+            </div>
+            <div class="field-row">
+              <label>Количество дверей</label>
+              <input id="wallpaperDoorCount" type="number" min="0" step="1" value="1" placeholder="Например 1" />
+            </div>
+            <div class="field-row">
+              <label>Количество окон</label>
+              <input id="wallpaperWindowCount" type="number" min="0" step="1" value="1" placeholder="Например 2" />
+            </div>
+            <div class="field-row">
+              <label>Цена за 1 рулон, ₸</label>
+              <input id="wallpaperPrice" type="number" min="0" step="1" placeholder="Например 6500" />
+            </div>
+            <div class="field-row">
+              <label>Запас, %</label>
+              <input id="wallpaperReserve" type="number" min="0" step="1" value="10" placeholder="Например 10" />
+            </div>
+            <div class="option-group">
+              <label class="option-title">Размер рулона</label>
+              <div class="tile-info">Стандарт: <strong id="wallpaperRollSize">1 × 10 м</strong> (<strong id="wallpaperRollArea">10 м²</strong>)</div>
+              <div class="tile-info">Стандартные проемы: дверь 0.7 × 2.0 м, окно 1.5 × 1.4 м</div>
+            </div>
+            <p class="error-message" id="wallpaperError"></p>
+            <div class="button-row">
+              <button id="wallpaperCalculate" type="button" class="button button-primary">РАССЧИТАТЬ</button>
+              <button id="wallpaperClear" type="button" class="button button-secondary">ОЧИСТИТЬ</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="result-card" id="wallpaperResultCard">
+          <div class="result-header">
+            <h3>Ваш расчёт для обоев</h3>
+            <button class="button button-copy" id="wallpaperCopy">СКОПИРОВАТЬ РАСЧЕТ</button>
+          </div>
+          <div class="result-content" id="wallpaperResultContent">
+            <div class="result-row"><span>Площадь стен:</span><strong id="wallpaperResultWallArea">0 м²</strong></div>
+            <div class="result-row"><span>Площадь с вычетом:</span><strong id="wallpaperResultUsableArea">0 м²</strong></div>
+            <div class="result-row"><span>Количество рулонов:</span><strong id="wallpaperResultRolls">0 шт.</strong></div>
+            <div class="result-row"><span>Запас:</span><strong id="wallpaperResultReserve">0 шт.</strong></div>
+            <div class="result-row"><span>Стоимость:</span><strong class="price-value" id="wallpaperResultTotal">0 ₸</strong></div>
+          </div>
+          <p class="copy-feedback" id="wallpaperCopyFeedback">Скопировано в буфер обмена</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>TABYS STROY</strong>
+        <p>Калькулятор строительных материалов</p>
+      </div>
+      <div>© 2026 TABYS STROY</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

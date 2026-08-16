@@ -106,6 +106,27 @@ const elements = {
     copyFeedback: document.getElementById('bambooCopyFeedback'),
     form: document.getElementById('bambooForm'),
   },
+  wallpaper: {
+    length: document.getElementById('wallpaperLength'),
+    width: document.getElementById('wallpaperWidth'),
+    height: document.getElementById('wallpaperHeight'),
+    doorCount: document.getElementById('wallpaperDoorCount'),
+    windowCount: document.getElementById('wallpaperWindowCount'),
+    price: document.getElementById('wallpaperPrice'),
+    reserve: document.getElementById('wallpaperReserve'),
+    calculate: document.getElementById('wallpaperCalculate'),
+    clear: document.getElementById('wallpaperClear'),
+    error: document.getElementById('wallpaperError'),
+    resultCard: document.getElementById('wallpaperResultCard'),
+    resultWallArea: document.getElementById('wallpaperResultWallArea'),
+    resultUsableArea: document.getElementById('wallpaperResultUsableArea'),
+    resultRolls: document.getElementById('wallpaperResultRolls'),
+    resultReserve: document.getElementById('wallpaperResultReserve'),
+    resultTotal: document.getElementById('wallpaperResultTotal'),
+    copy: document.getElementById('wallpaperCopy'),
+    copyFeedback: document.getElementById('wallpaperCopyFeedback'),
+    form: document.getElementById('wallpaperForm'),
+  },
 };
 
 let selectedTile = tileOptions[0];
@@ -141,6 +162,11 @@ function initializeMenu() {
   const menuToggle = document.querySelector('.menu-toggle');
   const siteNav = document.getElementById('siteNav');
   if (!menuToggle || !siteNav) return;
+
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle && !siteNav.contains(themeToggle)) {
+    siteNav.appendChild(themeToggle);
+  }
 
   const closeMenu = () => {
     siteNav.classList.remove('is-open');
@@ -512,6 +538,70 @@ function initializeBamboo() {
   });
 }
 
+function initializeWallpaper() {
+  if (!elements.wallpaper.form) return;
+
+  const rollArea = 1 * 10;
+  const rollSizeLabel = '1 × 10 м';
+  const rollAreaEl = document.getElementById('wallpaperRollArea');
+  if (rollAreaEl) rollAreaEl.textContent = `${formatNumber(rollArea, 2)} м²`;
+
+  elements.wallpaper.calculate.addEventListener('click', () => {
+    clearError(elements.wallpaper.error);
+
+    const length = getPositiveValue(elements.wallpaper.length, 'длину комнаты');
+    if (typeof length === 'string') return showError(elements.wallpaper.error, length);
+    const width = getPositiveValue(elements.wallpaper.width, 'ширину комнаты');
+    if (typeof width === 'string') return showError(elements.wallpaper.error, width);
+    const height = getPositiveValue(elements.wallpaper.height, 'высоту стен');
+    if (typeof height === 'string') return showError(elements.wallpaper.error, height);
+    const doorCount = getPositiveValue(elements.wallpaper.doorCount, 'количество дверей');
+    if (typeof doorCount === 'string') return showError(elements.wallpaper.error, doorCount);
+    const windowCount = getPositiveValue(elements.wallpaper.windowCount, 'количество окон');
+    if (typeof windowCount === 'string') return showError(elements.wallpaper.error, windowCount);
+    const price = getPositiveValue(elements.wallpaper.price, 'цену за 1 рулон');
+    if (typeof price === 'string') return showError(elements.wallpaper.error, price);
+    const reservePercent = getPositiveValue(elements.wallpaper.reserve, 'запас');
+    if (typeof reservePercent === 'string') return showError(elements.wallpaper.error, reservePercent);
+
+    const standardDoorArea = 0.7 * 2.0;
+    const standardWindowArea = 1.5 * 1.4;
+    const doorArea = doorCount * standardDoorArea;
+    const windowArea = windowCount * standardWindowArea;
+
+    const wallArea = (length + width) * 2 * height;
+    const usableWallArea = Math.max(0, wallArea - doorArea - windowArea);
+    const baseRolls = Math.ceil(usableWallArea / rollArea);
+    const reserveRolls = Math.ceil(baseRolls * (reservePercent / 100));
+    const totalRolls = baseRolls + reserveRolls;
+    const totalCost = totalRolls * price;
+
+    elements.wallpaper.resultWallArea.textContent = `${formatNumber(wallArea, 2)} м²`;
+    elements.wallpaper.resultUsableArea.textContent = `${formatNumber(usableWallArea, 2)} м²`;
+    elements.wallpaper.resultRolls.textContent = `${totalRolls} шт.`;
+    elements.wallpaper.resultReserve.textContent = `${reserveRolls} шт.`;
+    elements.wallpaper.resultTotal.textContent = formatCurrency(totalCost);
+    elements.wallpaper.resultCard.classList.add('active');
+  });
+
+  elements.wallpaper.clear.addEventListener('click', () => {
+    elements.wallpaper.form.reset();
+    elements.wallpaper.reserve.value = '10';
+    clearError(elements.wallpaper.error);
+    elements.wallpaper.resultCard.classList.remove('active');
+    elements.wallpaper.resultWallArea.textContent = '0 м²';
+    elements.wallpaper.resultUsableArea.textContent = '0 м²';
+    elements.wallpaper.resultRolls.textContent = '0 шт.';
+    elements.wallpaper.resultReserve.textContent = '0 шт.';
+    elements.wallpaper.resultTotal.textContent = '0 ₸';
+  });
+
+  elements.wallpaper.copy.addEventListener('click', () => {
+    const text = `TABYS STROY\n\nРасчет обоев\nРазмер рулона: ${rollSizeLabel}\nПлощадь стен: ${elements.wallpaper.resultWallArea.textContent}\nПлощадь после вычета: ${elements.wallpaper.resultUsableArea.textContent}\nКоличество рулонов: ${elements.wallpaper.resultRolls.textContent}\nЗапас: ${elements.wallpaper.resultReserve.textContent}\nИтого: ${elements.wallpaper.resultTotal.textContent}`;
+    copyText(text, elements.wallpaper.copyFeedback);
+  });
+}
+
 initializeTheme();
 initializeMenu();
 initializeTile();
@@ -519,3 +609,4 @@ initializeLinoleum();
 initializeLaminate();
 initializeMarble();
 initializeBamboo();
+initializeWallpaper();
