@@ -158,6 +158,391 @@ function initializeTheme() {
   }
 }
 
+function initializeGame() {
+  const startButton = document.getElementById('blockGameStart');
+  const scoreElement = document.getElementById('blockGameScore');
+  const bestElement = document.getElementById('blockGameBest');
+  const statusElement = document.getElementById('blockGameStatus');
+  const boardElement = document.getElementById('blockBoard');
+  const trayElement = document.getElementById('blockTray');
+
+  if (!startButton || !scoreElement || !bestElement || !statusElement || !boardElement || !trayElement) return;
+
+  const BOARD_SIZE = 8;
+  const PIECES = [
+    [[0, 0], [1, 0], [2, 0]],
+    [[0, 0], [1, 0], [0, 1]],
+    [[0, 0], [1, 0], [1, 1]],
+    [[0, 0], [1, 0], [0, 1], [1, 1]],
+    [[0, 0], [1, 0], [2, 0], [1, 1]],
+    [[0, 0], [1, 0], [2, 0], [3, 0]],
+    [[0, 0], [1, 0], [2, 0], [0, 1]],
+    [[0, 0], [0, 1], [1, 1], [2, 1]],
+    [[0, 0], [1, 0], [1, 1], [2, 1]],
+    [[0, 0], [1, 0], [2, 0], [2, 1]],
+    [[0, 0], [0, 1], [1, 1], [1, 2]],
+    [[0, 0], [1, 0], [1, 1], [0, 2]],
+  ];
+
+  const COLORS = ['#ff6b6b', '#ffd166', '#06d6a0', '#4cc9f0', '#8ecae6', '#c77dff', '#ff9f1c'];
+
+  let board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+  let tray = [];
+  let selectedPieceId = null;
+  let score = 0;
+  let bestScore = Number(localStorage.getItem('blockBlastBest') || 0);
+  let burstCells = [];
+  let isGameOver = false;
+  let dragState = {
+    pieceId: null,
+    row: null,
+    col: null,
+  };
+
+  const updateBest = () => {
+    bestElement.textContent = String(bestScore);
+  };
+
+  const updateScore = () => {
+    scoreElement.textContent = String(score);
+  };
+
+  const setStatus = (message) => {
+    statusElement.textContent = message;
+  };
+
+  const createRandomPiece = () => {
+    const template = PIECES[Math.floor(Math.random() * PIECES.length)];
+    return {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      cells: template.map(([row, col]) => [row, col]),
+    };
+  };
+
+  const tryPlacePiece = (piece, startRow, startCol) => {
+    const nextBoard = board.map((row) => row.slice());
+    let fits = true;
+    let blockCount = 0;
+
+    piece.cells.forEach(([rowOffset, colOffset]) => {
+      const row = startRow + rowOffset;
+      const col = startCol + colOffset;
+
+      if (row < 0 || row >= BOARD_SIZE || col < 0 || col >= BOARD_SIZE || nextBoard[row][col]) {
+        fits = false;
+        return;
+      }
+      blockCount += 1;
+    });
+
+    if (!fits) {
+      return { success: false, board, blockCount: 0 };
+    }
+
+    piece.cells.forEach(([rowOffset, colOffset]) => {
+      const row = startRow + rowOffset;
+      const col = startCol + colOffset;
+      nextBoard[row][col] = piece.color;
+    });
+
+    return { success: true, board: nextBoard, blockCount };
+  };
+
+  const clearCompletedLines = () => {
+    let cleared = 0;
+
+    for (let row = 0; row < BOARD_SIZE; row += 1) {
+      if (board[row].every(Boolean)) {
+        board[row].fill(null);
+        cleared += 1;
+      }
+    }
+
+    for (let col = 0; col < BOARD_SIZE; col += 1) {
+      const fullColumn = Array.from({ length: BOARD_SIZE }, (_, row) => board[row][col]).every(Boolean);
+      if (fullColumn) {
+        for (let row = 0; row < BOARD_SIZE; row += 1) {
+          board[row][col] = null;
+        }
+        cleared += 1;
+      }
+    }
+
+    return cleared;
+  };
+
+  const hasAnyValidMove = () => {
+    for (const piece of tray) {
+      for (let row = 0; row < BOARD_SIZE; row += 1) {
+        for (let col = 0; col < BOARD_SIZE; col += 1) {
+          const placement = tryPlacePiece(piece, row, col);
+          if (placement.success) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
+
+  const endGame = () => {
+    isGameOver = true;
+    startButton.textContent = 'НАЧАТЬ ЗАНОВО';
+    setStatus('Ты проиграл. Попробуй ещё!');
+    bestScore = Math.max(bestScore, score);
+    localStorage.setItem('blockBlastBest', String(bestScore));
+    updateBest();
+  };
+
+  const placePieceAt = (pieceId, row, col) => {
+    const selected = tray.find((piece) => piece.id === pieceId);
+    if (!selected) return;
+
+    const placement = tryPlacePiece(selected, row, col);
+    if (!placement.success) {
+      setStatus('Здесь фигура не помещается. Попробуй другое место.');
+      return;
+    }
+
+    board = placement.board;
+    burstCells = selected.cells.map(([rowOffset, colOffset]) => ({
+      row: row + rowOffset,
+      col: col + colOffset,
+    }));
+    score += placement.blockCount * 10;
+    updateScore();
+    tray = tray.filter((piece) => piece.id !== selected.id);
+    selectedPieceId = null;
+    dragState = { pieceId: null, row: null, col: null };
+
+    const cleared = clearCompletedLines();
+    if (cleared > 0) {
+      score += cleared * 50;
+      updateScore();
+      setStatus(`Отлично! Очистили ${cleared} лини${cleared === 1 ? 'ю' : 'и'}.`);
+    } else {
+      setStatus('Хороший ход!');
+    }
+
+    if (tray.length < 3) {
+      while (tray.length < 3) {
+        tray.push(createRandomPiece());
+      }
+    }
+
+    if (!hasAnyValidMove()) {
+      endGame();
+      renderTray();
+      renderBoard();
+      return;
+    }
+
+    renderTray();
+    renderBoard();
+
+    window.setTimeout(() => {
+      burstCells = [];
+      renderBoard();
+    }, 260);
+  };
+
+  const getDragPreviewCells = (piece, row, col) => {
+    if (!piece || row === null || col === null) return [];
+    const previewCells = [];
+    let valid = true;
+
+    piece.cells.forEach(([rowOffset, colOffset]) => {
+      const nextRow = row + rowOffset;
+      const nextCol = col + colOffset;
+      if (nextRow < 0 || nextRow >= BOARD_SIZE || nextCol < 0 || nextCol >= BOARD_SIZE || board[nextRow][nextCol]) {
+        valid = false;
+        return;
+      }
+      previewCells.push({ row: nextRow, col: nextCol });
+    });
+
+    return valid ? previewCells : [];
+  };
+
+  const renderBoard = () => {
+    boardElement.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+    const draggingPiece = tray.find((piece) => piece.id === dragState.pieceId) || null;
+    const previewCells = draggingPiece && dragState.row !== null && dragState.col !== null
+      ? getDragPreviewCells(draggingPiece, dragState.row, dragState.col)
+      : [];
+    const previewMap = new Map(previewCells.map(({ row, col }) => [`${row}:${col}`, draggingPiece.color]));
+    const burstMap = new Map(burstCells.map(({ row, col }) => [`${row}:${col}`, true]));
+
+    for (let row = 0; row < BOARD_SIZE; row += 1) {
+      for (let col = 0; col < BOARD_SIZE; col += 1) {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'board-cell';
+        cell.dataset.row = String(row);
+        cell.dataset.col = String(col);
+        if (board[row][col]) {
+          cell.classList.add('filled');
+          cell.style.background = board[row][col];
+        }
+        if (previewMap.has(`${row}:${col}`)) {
+          cell.classList.add('preview');
+          cell.style.background = previewMap.get(`${row}:${col}`);
+          cell.style.opacity = '0.55';
+        }
+        if (burstMap.has(`${row}:${col}`)) {
+          cell.classList.add('burst');
+          cell.style.animationDelay = `${(Math.random() * 0.12).toFixed(2)}s`;
+        }
+        fragment.appendChild(cell);
+      }
+    }
+
+    boardElement.appendChild(fragment);
+
+    boardElement.querySelectorAll('.board-cell').forEach((cell) => {
+      cell.addEventListener('pointerdown', (event) => {
+        if (isGameOver || !selectedPieceId) return;
+        const row = Number(cell.dataset.row);
+        const col = Number(cell.dataset.col);
+        const selected = tray.find((piece) => piece.id === selectedPieceId);
+        if (selected) {
+          event.preventDefault();
+          placePieceAt(selected.id, row, col);
+        }
+      });
+    });
+  };
+
+  const renderTray = () => {
+    trayElement.innerHTML = '';
+
+    tray.forEach((piece) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `block-piece ${piece.id === selectedPieceId ? 'selected' : ''}`;
+      button.setAttribute('aria-label', 'Выбрать фигуру');
+      button.style.touchAction = 'none';
+
+      const grid = document.createElement('div');
+      grid.className = 'piece-grid';
+
+      for (let row = 0; row < 4; row += 1) {
+        for (let col = 0; col < 4; col += 1) {
+          const cell = document.createElement('span');
+          cell.className = 'piece-cell';
+          const isFilled = piece.cells.some(([pieceRow, pieceCol]) => pieceRow === row && pieceCol === col);
+          if (isFilled) {
+            cell.classList.add('filled');
+            cell.style.background = piece.color;
+          }
+          grid.appendChild(cell);
+        }
+      }
+
+      const label = document.createElement('div');
+      label.className = 'block-piece-label';
+      label.textContent = 'Фигура';
+
+      button.appendChild(grid);
+      button.appendChild(label);
+
+      button.addEventListener('pointerdown', (event) => {
+        if (isGameOver) return;
+        event.preventDefault();
+        selectedPieceId = piece.id;
+        dragState = { pieceId: piece.id, row: null, col: null };
+        renderTray();
+        renderBoard();
+        setStatus('Перетаскивайте фигуру по полю и отпустите, чтобы поставить её.');
+      });
+
+      trayElement.appendChild(button);
+    });
+  };
+
+  boardElement.addEventListener('pointermove', (event) => {
+    if (!dragState.pieceId) return;
+
+    const rect = boardElement.getBoundingClientRect();
+    const cellSize = rect.width / BOARD_SIZE;
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const row = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor(y / cellSize)));
+    const col = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor(x / cellSize)));
+
+    dragState.row = row;
+    dragState.col = col;
+    renderBoard();
+  });
+
+  boardElement.addEventListener('pointerleave', () => {
+    if (!dragState.pieceId) return;
+    dragState.row = null;
+    dragState.col = null;
+    renderBoard();
+  });
+
+  boardElement.addEventListener('pointerup', (event) => {
+    if (!dragState.pieceId) return;
+
+    const rect = boardElement.getBoundingClientRect();
+    const cellSize = rect.width / BOARD_SIZE;
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+      const row = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor(y / cellSize)));
+      const col = Math.min(BOARD_SIZE - 1, Math.max(0, Math.floor(x / cellSize)));
+      placePieceAt(dragState.pieceId, row, col);
+    } else {
+      dragState = { pieceId: null, row: null, col: null };
+      renderBoard();
+    }
+  });
+
+  document.addEventListener('pointerup', () => {
+    if (!dragState.pieceId) return;
+    const piece = tray.find((item) => item.id === dragState.pieceId);
+    if (!piece || dragState.row === null || dragState.col === null) {
+      dragState = { pieceId: null, row: null, col: null };
+      renderBoard();
+      return;
+    }
+
+    const placement = getDragPreviewCells(piece, dragState.row, dragState.col);
+    if (placement.length > 0) {
+      placePieceAt(piece.id, dragState.row, dragState.col);
+    } else {
+      dragState = { pieceId: null, row: null, col: null };
+      renderBoard();
+      setStatus('Такое положение фигуры недоступно. Выбери другую клетку.');
+    }
+  });
+
+  const resetGame = () => {
+    isGameOver = false;
+    startButton.textContent = 'НОВАЯ ИГРА';
+    board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+    tray = Array.from({ length: 3 }, createRandomPiece);
+    selectedPieceId = null;
+    burstCells = [];
+    dragState = { pieceId: null, row: null, col: null };
+    score = 0;
+    updateScore();
+    updateBest();
+    setStatus('Выбери фигуру и перетащи её на поле.');
+    renderTray();
+    renderBoard();
+  };
+
+  startButton.addEventListener('click', resetGame);
+  updateBest();
+  resetGame();
+}
+
 function initializeMenu() {
   const menuToggle = document.querySelector('.menu-toggle');
   const siteNav = document.getElementById('siteNav');
@@ -401,10 +786,11 @@ function initializeLaminate() {
 
     const roomArea = length * width;
     const packCount = Math.ceil(roomArea / packArea);
+    const coveredArea = packCount * packArea;
     const totalCost = packCount * packArea * price;
 
     elements.laminate.resultPackArea.textContent = `${formatNumber(packArea, 2)} м²`;
-    elements.laminate.resultArea.textContent = `${formatNumber(roomArea, 2)} м²`;
+    elements.laminate.resultArea.textContent = `${formatNumber(coveredArea, 2)} м²`;
     elements.laminate.resultPacks.textContent = `${packCount} пачек`;
     elements.laminate.resultTotal.textContent = formatCurrency(totalCost);
     elements.laminate.resultCard.classList.add('active');
@@ -604,6 +990,7 @@ function initializeWallpaper() {
 
 initializeTheme();
 initializeMenu();
+initializeGame();
 initializeTile();
 initializeLinoleum();
 initializeLaminate();

@@ -85,6 +85,41 @@
         <p>Рассчитать рулоны, вычет дверей/окон, запас и стоимость.</p>
       </a>
     </div>
+
+    <section class="game-section" aria-label="Мини-игра для отдыха">
+      <div class="section-header game-header">
+        <span class="section-tag">Отдых</span>
+        <h2>Block Blast</h2>
+        <p>Собирай блоки, заполняй линии и получай заряд бодрости между задачами.</p>
+      </div>
+
+      <div class="block-game-panel">
+        <div class="block-game-topbar">
+          <div class="game-stat">
+            <span>Счёт</span>
+            <strong id="blockGameScore">0</strong>
+          </div>
+          <div class="game-stat">
+            <span>Лучшая</span>
+            <strong id="blockGameBest">0</strong>
+          </div>
+          <button id="blockGameStart" class="button button-primary game-button" type="button">НОВАЯ ИГРА</button>
+        </div>
+
+        <div class="block-game-layout">
+          <div class="block-board-wrap">
+            <div id="blockBoard" class="block-board" aria-label="Игровое поле"></div>
+          </div>
+
+          <div class="block-tray-wrap">
+            <div class="tray-title">Фигуры</div>
+            <div id="blockTray" class="block-tray" aria-label="Трек фигур"></div>
+          </div>
+        </div>
+
+        <p id="blockGameStatus" class="block-game-status">Выбери фигуру и поставь её на поле.</p>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
